@@ -3,32 +3,39 @@
 This project shows an example of a multi-llm multimedia enabled chatbot that can do web research. This example supports accessing
 the researcher agent either directly, using REST, or through a chatbot interface
 
-## Core Concepts
-1. Customizing the AgentProcessingUnit
-2. Running the UI
+## Agents
+### research_agent
+The `research_agent` is the top level agent that coordinates web research using the search_agent and scraping_agent.
 
-## Directory Structure
+### search_agent
+Returns web search results using <a href="https://developers.google.com/custom-search" target=_blank>Google Programmable Search Engine</a> (formerly Custom Search Engine, or CSE).
 
-- `resources`: This directory contains additional resources for the project. An example agent is provided for reference.
-- `components`: This directory is where any custom code should be placed.
+### scraping_agent
+Navigates, extracts and manipulates web pages (including javascript loaded content) using <a href="https://www.crummy.com/software/BeautifulSoup/" target=_blank>beautifulsoup</a>. Scraped content can then be used and interpreted by another agent (in this case research_agent above).
+
+## Prerequisites
+### OpenAI API Key
+This example is currently configured to use an OpenAI LLM. See our [authenticating guide](https://www.eidolonai.com/docs/howto/authenticate_llm)
+for help finding your API key. To swap out the LLM for a different provider (or host your own) see Eidolon's documentation 
+on [swapping LLMs](https://www.eidolonai.com/docs/howto/swap_llm).
+
+### Google Programmable Search Engine ID / Token
+You will need to create a [Google Programmable Search Engine](https://programmablesearchengine.google.com).
+
+After creating this resource, you will be prompted for the search engine ID (`CSE_ID`) and token (`CSE_TOKEN`) when you run the server. 
 
 ## Running the Server in Docker
 
-First you need to clone the project and navigate to the project directory:
+To clone and run this example using docker, use the following commands:
 
 ```bash
 git clone https://github.com/eidolon-ai/web-researcher.git
 cd web-researcher
-```
-
-Then run the server using docker, use the following command:
-
-```bash
 make docker-serve
 ```
 
 The first time you run this command, you may be prompted to enter credentials that the machine needs 
-to run (ie, OpenAI API Key).
+to run (ie, OpenAI API Key, CSE_ID / CSE_TOKEN from Prerequisites).
 
 This command will download the dependencies required to run your agent machine and start the Eidolon http server in
 "dev-mode".
@@ -42,50 +49,4 @@ INFO:     Waiting for application startup.
 INFO - Building machine 'local_dev'
 ...
 INFO - Server Started in 1.50s
-```
-
-## Running the server in K8s
-
-### Prerequisites
-
-WARNING: This will work for local k8s environments only. See [Readme.md in the k8s directory](./k8s/Readme.md) if you are using this against a cloud based k8s environment.
-
-To use kubernetes for local development, you will need to have the following installed:
-
-- [Docker](https://docs.docker.com/get-docker/)
-- [Kubernetes](https://kubernetes.io/docs/tasks/tools/)
-- [Helm](https://helm.sh/docs/intro/install/)
-
-### Installation
-
-If you are using Minikube, run the following commands before any make commands:
-
-```bash
-alias kubectl="minikube kubectl --"
-eval $(minikube docker-env)
-```
-
-Make sure your kubernetes environment is set up properly and install the Eidolon k8s operator.
-
-```bash
-make k8s-operator
-```
-
-This will install the Eidolon operator in your k8s cluster. **This only needs to be done once.**
-
-Next install the Eidolon resources. This will create an Eidolon machine and an Eidolon agent in your cluster, start them, and tail the logs:
-
-```bash
-make k8s-serve
-```
-
-If the server starts successfully, you should see the following output:
-
-```
-Deployment is ready. Tailing logs from new pods...
-INFO:     Started server process [1]
-INFO:     Waiting for application startup.
-INFO - Building machine 'local-dev'
-INFO - Starting agent 'hello-world'
-INFO - Server Started in 0.86s
 ```

@@ -7,15 +7,15 @@ NAMESPACE ?= eidolon
 
 ARGS ?=
 
-serve-dev: .make/poetry_install .env
+serve-dev: .make/poetry_install .env .make/playwright
 	@echo "Starting Server..."
 	@poetry run eidolon-server -m local_dev resources --dotenv .env $(ARGS)
 
-serve: .make/poetry_install .env
+serve: .make/poetry_install .env .make/playwright
 	@echo "Starting Server..."
 	@poetry run eidolon-server resources --dotenv .env $(ARGS)
 
-test: .make/poetry_install .env
+test: .make/poetry_install .env .make/playwright
 	@poetry run pytest tests $(ARGS)
 
 .env: Makefile
@@ -46,6 +46,10 @@ test: .make/poetry_install .env
 .make/poetry_install: .make poetry.lock
 	poetry install
 	@touch .make/poetry_install
+
+.make/playwright: .make .make/poetry_install
+	poetry run playwright install --with-deps chromium
+	@touch .make/playwright
 
 poetry.lock: pyproject.toml
 	poetry lock --no-update
