@@ -35,3 +35,4 @@ spec:
       title: Claude Sonnet
     - apu: ClaudeHaiku
       title: Claude Haiku
+  title_generation_mode: auto
